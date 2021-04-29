@@ -1,0 +1,63 @@
+{
+  "name": "cars-api",
+  "version": "0.0.1",
+  "main": "",
+  "license": "MIT",
+  "author": "akirilyuk",
+  "description": "have fun with cars",
+  "repository": "https://github.com/s1ckn3zz1337/cars",
+  "dependencies": {
+    "awilix": "4.2.6",
+    "dotenv": "8.2.0",
+    "uuid": "8.2.0",
+    "winston": "3.3.3"
+  },
+  "devDependencies": {
+    "commitizen": "4.1.2",
+    "cz-gitmoji": "0.0.7",
+    "eslint": "7.3.1",
+    "eslint-config-airbnb-base": "14.2.0",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-plugin-import": "2.22.0",
+    "eslint-plugin-jest": "23.17.1",
+    "eslint-plugin-prettier": "3.1.4",
+    "husky": "4.2.5",
+    "jest": "26.6.3",
+    "jest-extended": "0.11.5",
+    "jsinspect": "0.12.7",
+    "nodemon": "2.0.4",
+    "prettier": "2.0.5",
+    "prettier-eslint-cli": "5.0.0",
+    "supertest": "4.0.2"
+  },
+  "scripts": {
+    "format": "prettier-eslint --write \"src/**/*.js\" \"test/**/*.js\"",
+    "security": "yarn audit --groups dependencies optionalDependencies --registry=https://registry.npmjs.org",
+    "outofdate": "yarn outdated",
+    "duplicated": "jsinspect -t 30",
+    "lint": "eslint .",
+    "test": "export NODE_ENV=TEST && yarn run jest --maxWorkers=50%",
+    "commit": "git-cz",
+    "release:patch": "npm version patch --no-git-tag-version && git add . && git commit -m \"🔖  Bump patch version\"",
+    "release:minor": "npm version minor --no-git-tag-version && git add . && git commit -m \"🔖  Bump minor version\"",
+    "release:major": "npm version major --no-git-tag-version && git add . && git commit -m \"🔖  Bump major version\"",
+    "dev": "export NODE_ENV=DEVELOPMENT && nodemon --inspect=0.0.0.0:4002 src/index.js"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-gitmoji"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn lint && yarn duplicated && yarn test:push"
+    }
+  },
+  "jest-junit": {
+    "outputName": "./test-results.xml",
+    "outputDirectory": "."
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
