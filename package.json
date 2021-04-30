@@ -46,7 +46,9 @@
     "release:patch": "npm version patch --no-git-tag-version && git add . && git commit -m \"🔖  Bump patch version\"",
     "release:minor": "npm version minor --no-git-tag-version && git add . && git commit -m \"🔖  Bump minor version\"",
     "release:major": "npm version major --no-git-tag-version && git add . && git commit -m \"🔖  Bump major version\"",
-    "dev": "export NODE_ENV=DEVELOPMENT && nodemon --inspect=0.0.0.0:4002 src/index.js"
+    "dev": "export NODE_ENV=DEV && nodemon --inspect=0.0.0.0:4002 src/index.js",
+    "start": "export NODE_ENV=PRODUCTION && node src/index.js",
+    "dev-db": "docker-compose --env-file ./.env.dev up --force-recreate -d"
   },
   "config": {
     "commitizen": {

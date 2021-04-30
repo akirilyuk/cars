@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const httpStatus = require('http-status-codes');
 const winston = require('winston');
-
 const { createContainer, asValue, asFunction } = require('awilix');
-const { routerCars } = require('./routes');
+
+const { routerCars, routerHealth } = require('./routes');
 const { ModelCar } = require('./models');
-const { mongoClient } = require('./lib');
+const { mongoClient, logger } = require('./lib');
 const config = require('./config');
 
 const container = createContainer();
@@ -16,11 +16,16 @@ container.register({
   winston: asValue(winston),
   httpStatus: asValue(httpStatus),
   mongoose: asValue(mongoose),
-  routerCars: asFunction(routerCars),
+
   ModelCar: asFunction(ModelCar),
   express: asValue(express),
   config: asValue(config),
-  mongoClient: asFunction(mongoClient)
+
+  mongoClient: asFunction(mongoClient).singleton(),
+  logger: asFunction(logger).singleton(),
+
+  routerCars: asFunction(routerCars).singleton(),
+  routerHealth: asFunction(routerHealth).singleton()
 });
 
 const app = container.resolve('express')();
@@ -32,7 +37,10 @@ app.use('/_health/ping', (req, res) => {
   });
 });
 
-app.use(bodyParser.json()).use('/api', container.resolve('routerCars'));
+app
+  .use(bodyParser.json())
+  .use('/api', container.resolve('routerCars'))
+  .use('/health', container.resolve('routerHealth'));
 
 const server = app.listen(config.GLOBAL.PORT);
 
