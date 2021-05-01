@@ -70,7 +70,9 @@ module.exports = ({ mongoose, logger, config: { MONGO } }) => {
         }
         throw new Error('failed to check health');
       } catch (error) {
-        this.log.error('failed to check health', { error: error.message });
+        this.log.error('failed to mongo check health', {
+          error: error.message
+        });
       }
       return false;
     }
