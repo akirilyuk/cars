@@ -1,7 +1,15 @@
 module.exports = ({
   express,
   httpStatus: { OK },
-  handlerCar: { findCarById, returnCar, updateCar, validateUpdate, validateId }
+  handlerCar: {
+    findCarById,
+    returnCar,
+    updateCar,
+    validateUpdate,
+    validateId,
+    deleteCar
+    // updateCarWithFindOneAndUpdate //remove comment here to use updateCarWithFindOneAndUpdate
+  }
 }) => {
   const router = express.Router();
 
@@ -30,10 +38,7 @@ module.exports = ({
   /**
    * Delete
    */
-  router.delete('/car/:id', (req, res) => {
-    res.state = OK;
-    res.json({});
-  });
+  router.delete('/car/:id', deleteCar);
 
   /**
    * Update one car
@@ -42,8 +47,9 @@ module.exports = ({
     '/car/:id',
     validateId,
     validateUpdate,
-    findCarById,
-    updateCar,
+    findCarById, // comment this out to use  updateCarWithFindOneAndUpdate
+    updateCar, // comment this out to use  updateCarWithFindOneAndUpdate
+    // updateCarWithFindOneAndUpdate,
     returnCar
   );
 

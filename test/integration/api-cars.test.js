@@ -198,7 +198,6 @@ describe('test health api', () => {
 
       expect(newItemInDB.toJSON()).toEqual(carCopy);
     });
-
     it('should return 200 and update car cabrio in DB if car exists', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -228,7 +227,6 @@ describe('test health api', () => {
 
       expect(newItemInDB.toJSON()).toEqual(carCopy);
     });
-
     it('should return 200 and update car transmission in DB if car exists', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -259,7 +257,6 @@ describe('test health api', () => {
 
       expect(newItemInDB.toJSON()).toEqual(carCopy);
     });
-
     it('should return 400 and not update car in DB if nothing to changed', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -288,7 +285,6 @@ describe('test health api', () => {
       });
       expect(saveSpy).toHaveBeenCalledTimes(0);
     });
-
     it('should return 500 if something failed during DB update', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -321,7 +317,6 @@ describe('test health api', () => {
       });
       expect(saveSpy).toHaveBeenCalledTimes(1);
     });
-
     it('should return 400 and not get car from db and not update car in DB if color value not in ENUM', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -353,7 +348,6 @@ describe('test health api', () => {
       expect(saveSpy).not.toHaveBeenCalled();
       expect(findByIdSpy).not.toHaveBeenCalled();
     });
-
     it('should return 400 and not get car from db and not update car in DB if vendor value not in ENUM', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -385,7 +379,6 @@ describe('test health api', () => {
       expect(saveSpy).not.toHaveBeenCalled();
       expect(findByIdSpy).not.toHaveBeenCalled();
     });
-
     it('should return 400 and not get car from db and not update car in DB if seats value not in ENUM', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -417,7 +410,6 @@ describe('test health api', () => {
       expect(saveSpy).not.toHaveBeenCalled();
       expect(findByIdSpy).not.toHaveBeenCalled();
     });
-
     it('should return 400 and not get car from db and not update car in DB if cabrio value is string', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -449,7 +441,6 @@ describe('test health api', () => {
       expect(saveSpy).not.toHaveBeenCalled();
       expect(findByIdSpy).not.toHaveBeenCalled();
     });
-
     it('should return 400 and not get car from db and not update car in DB if automaticTransmission value is string', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -481,7 +472,6 @@ describe('test health api', () => {
       expect(saveSpy).not.toHaveBeenCalled();
       expect(findByIdSpy).not.toHaveBeenCalled();
     });
-
     it('should return 200 and update car transmission in DB if car exists, only automaticTransmission and id provided', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -520,7 +510,6 @@ describe('test health api', () => {
         automaticTransmission: updateBody.automaticTransmission
       });
     });
-
     it('should return 400 and not get car from db and not update car in DB if params id does not match body id', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -551,6 +540,64 @@ describe('test health api', () => {
       });
       expect(saveSpy).not.toHaveBeenCalled();
       expect(findByIdSpy).not.toHaveBeenCalled();
+    });
+  });
+  describe('test DELETE /api/car/:id', () => {
+    it('should return 200 and delete car from database if exists', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const carCopy = existingCarModel.toJSON();
+
+      const path = `/api/car/${carCopy.id}`;
+
+      const { body, status } = await supertest(app).delete(path);
+
+      expect(status).toEqual(httpStatus.OK);
+      expect(body).toEqual({});
+
+      // verify we really updated the item in the database
+      const existingCarModelInDB = await ModelCar.findById(carCopy.id);
+      expect(existingCarModelInDB).toBeNull();
+    });
+    it('should return 404 and not delete car from database if does not exist in DB', async () => {
+      const path = `/api/car/${mongoose.Types.ObjectId()}`;
+
+      const { body, status } = await supertest(app).delete(path);
+
+      expect(status).toEqual(httpStatus.NOT_FOUND);
+      expect(body).toEqual({
+        error: {
+          message: 'item not found',
+          status: httpStatus.NOT_FOUND,
+          code: constErrors.handler.car.deleteCar.notFound
+        }
+      });
+    });
+    it('should return 500 on DB error', async () => {
+      const path = `/api/car/${mongoose.Types.ObjectId()}`;
+
+      const deleteOneSpy = jest.spyOn(ModelCar, 'deleteOne');
+
+      const errorMessage = 'some mongo error';
+      deleteOneSpy.mockRejectedValueOnce(new Error(errorMessage));
+
+      const { body, status } = await supertest(app).delete(path);
+
+      expect(status).toEqual(httpStatus.INTERNAL_SERVER_ERROR);
+      expect(body).toEqual({
+        error: {
+          message: errorMessage,
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          code: constErrors.handler.car.deleteCar.mongoError
+        }
+      });
     });
   });
 });
