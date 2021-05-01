@@ -1,10 +1,14 @@
-module.exports = ({ express, ModelCar, httpStatus: { OK } }) => {
+module.exports = ({
+  express,
+  httpStatus: { OK },
+  handlerCar: { findCarById }
+}) => {
   const router = express.Router();
 
   /**
    * Get all metadata of all cars
    */
-  router.get('/car', (req, res) => {
+  router.get('/car', async (req, res) => {
     res.state = OK;
     res.json({});
   });
@@ -17,13 +21,11 @@ module.exports = ({ express, ModelCar, httpStatus: { OK } }) => {
 
     res.json({});
   });
+
   /**
    * Get car by ID
    */
-  router.get('/car/:id', (req, res) => {
-    res.state = OK;
-    res.json({});
-  });
+  router.get('/car/:id', findCarById);
 
   /**
    * Delete

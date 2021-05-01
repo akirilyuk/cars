@@ -42,7 +42,7 @@
     "outofdate": "yarn outdated",
     "duplicated": "jsinspect -t 30",
     "lint": "eslint .",
-    "test": "export NODE_ENV=TEST && yarn run jest --maxWorkers=50%",
+    "test": "export NODE_ENV=TEST && yarn run jest -i",
     "commit": "git-cz",
     "release:patch": "npm version patch --no-git-tag-version && git add . && git commit -m \"🔖  Bump patch version\"",
     "release:minor": "npm version minor --no-git-tag-version && git add . && git commit -m \"🔖  Bump minor version\"",

@@ -1,30 +1,43 @@
-module.exports = ({ mongoose: { Schema } }) => {
-  const COLOR = ['blue', 'red', 'green', 'yellow', 'black'];
-  const VENDOR = ['Bmw', 'Mercedes', 'Volkswagen'];
-  const SEATS = [2, 4, 6];
-  const model = new Schema({
+module.exports = ({ mongoose }) => {
+  const COLOR = { BLUE: 'blue', RED: 'red', GREEN: 'green', YELLOW: 'yellow' };
+  const VENDOR = { BMW: 'bmw', MERCEDES: 'mercedes', VOLKSWAGEN: 'volkswagen' };
+  const SEATS = { TWO: 2, FOUR: 4, SIX: 6 };
+  const schema = new mongoose.Schema({
     color: {
       type: String,
-      enum: COLOR,
-      default: COLOR[0]
+      enum: Object.values(COLOR),
+      default: COLOR.BLUE
     }, // color of the car, eg blue, red, brown etc
     vendor: {
       type: String,
-      enum: VENDOR,
-      default: VENDOR[0]
+      enum: Object.values(VENDOR),
+      default: VENDOR.BMW
     }, // car vendor
     seats: {
       type: Number,
-      enum: SEATS,
-      default: SEATS
+      enum: Object.values(SEATS),
+      default: SEATS.FOUR
     }, // car size
     cabrio: Boolean, // is this a cabrio or not
-    transmisssion: Boolean // fo
+    automaticTransmission: Boolean //  true for automatic, false for manual
   });
-  model.ENUMS = {
+
+  schema.methods.toJSON = function () {
+    const jsonObject = {
+      ...this._doc,
+      id: this._id.toString()
+    };
+
+    delete jsonObject.__v;
+    delete jsonObject._id;
+
+    return jsonObject;
+  };
+  const Model = mongoose.model('Car', schema);
+  Model.ENUMS = {
     COLOR,
     VENDOR,
     SEATS
   };
-  return model;
+  return Model;
 };

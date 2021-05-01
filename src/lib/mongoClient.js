@@ -76,5 +76,7 @@ module.exports = ({ mongoose, logger, config: { MONGO } }) => {
     }
   }
 
-  return new MongoClient();
+  const client = new MongoClient();
+  client.test();
+  return client;
 };

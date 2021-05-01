@@ -11,14 +11,14 @@ services:
       - 27017:27017
     volumes:
       - ./db:/data/db
-  app:
-    build: .
-    ports:
-      - 3000:3000
-    environment:
-      MONGO_ADDRESS: "mongo"
-      MONGO_PORT: 27017
-      MONGO_DATABASE_NAME: "cars"
-      NODE_ENV: "production"
-      GLOBAL_PORT: 3000
+  #app:
+    #build: .
+    #ports:
+    #  - 3000:3000
+    #environment:
+     # MONGO_ADDRESS: "mongo"
+      #MONGO_PORT: 27017
+      #MONGO_DATABASE_NAME: "cars"
+     # NODE_ENV: "production"
+      #GLOBAL_PORT: 3000
 
