@@ -91,4 +91,210 @@ describe('test health api', () => {
       expect(body).toEqual(existingCarModel.toJSON());
     });
   });
+  describe('test PUT /api/car/:id', () => {
+    it('should return 404 if desired car not found', async () => {
+      // first we do the first health check => we init the db connection etc
+      const path = `/api/car/${mongoose.Types.ObjectId()}`;
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+      const { body, status } = await supertest(app).get(path);
+      expect(status).toEqual(httpStatus.NOT_FOUND);
+      expect(body).toEqual({
+        error: {
+          message: 'could not find car',
+          status: httpStatus.NOT_FOUND,
+          code: constErrors.handler.car.findCarById.notFound
+        }
+      });
+
+      expect(saveSpy).not.toHaveBeenCalled();
+    });
+    it('should return 200 and update car vendor in DB if car exists', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const carCopy = existingCarModel.toJSON();
+
+      carCopy.vendor = ModelCar.ENUMS.VENDOR.BMW;
+
+      const path = `/api/car/${existingCarModel._id.toString()}`;
+
+      // create the spy after populated the db
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+
+      const { body, status } = await supertest(app).put(path).send(carCopy);
+
+      expect(status).toEqual(httpStatus.OK);
+      expect(body).toEqual(carCopy);
+
+      // verify we have called save two times,
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+    it('should return 200 and update car color in DB if car exists', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const carCopy = existingCarModel.toJSON();
+
+      carCopy.color = ModelCar.ENUMS.COLOR.GREEN;
+
+      const path = `/api/car/${existingCarModel._id.toString()}`;
+      // create the spy after populated the db
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+      const { body, status } = await supertest(app).put(path).send(carCopy);
+
+      expect(status).toEqual(httpStatus.OK);
+      expect(body).toEqual(carCopy);
+
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+    it('should return 200 and update car seats in DB if car exists', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const carCopy = existingCarModel.toJSON();
+
+      carCopy.seats = ModelCar.ENUMS.SEATS.TWO;
+
+      const path = `/api/car/${existingCarModel._id.toString()}`;
+
+      // create the spy after populated the db
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+      const { body, status } = await supertest(app).put(path).send(carCopy);
+
+      expect(status).toEqual(httpStatus.OK);
+      expect(body).toEqual(carCopy);
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 200 and update car cabrio in DB if car exists', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const carCopy = existingCarModel.toJSON();
+
+      carCopy.cabrio = false;
+
+      const path = `/api/car/${existingCarModel._id.toString()}`;
+
+      // create the spy after populated the db
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+      const { body, status } = await supertest(app).put(path).send(carCopy);
+
+      expect(status).toEqual(httpStatus.OK);
+      expect(body).toEqual(carCopy);
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 200 and update car transmission in DB if car exists', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const carCopy = existingCarModel.toJSON();
+
+      carCopy.automaticTransmission = true;
+
+      const path = `/api/car/${existingCarModel._id.toString()}`;
+
+      // create the spy after populated the db
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+
+      const { body, status } = await supertest(app).put(path).send(carCopy);
+
+      expect(status).toEqual(httpStatus.OK);
+      expect(body).toEqual(carCopy);
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 400 and not update car in DB if nothing to changed', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const path = `/api/car/${existingCarModel._id.toString()}`;
+
+      // create the spy after populated the db
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+      const { body, status } = await supertest(app)
+        .put(path)
+        .send(existingCarModel.toJSON());
+
+      expect(status).toEqual(httpStatus.BAD_REQUEST);
+      expect(body).toEqual({
+        error: {
+          message: 'nothing to update',
+          status: httpStatus.BAD_REQUEST,
+          code: constErrors.handler.car.updateCar.noChanges
+        }
+      });
+      expect(saveSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should return 500 if something failed during DB update', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+
+      const carCopy = existingCarModel.toJSON();
+
+      carCopy.automaticTransmission = true;
+
+      const path = `/api/car/${existingCarModel._id.toString()}`;
+
+      // create the spy after populated the db
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+      const errorMessage = 'could not save';
+      saveSpy.mockRejectedValue(new Error(errorMessage));
+      const { body, status } = await supertest(app).put(path).send(carCopy);
+
+      expect(status).toEqual(httpStatus.INTERNAL_SERVER_ERROR);
+      expect(body).toEqual({
+        error: {
+          message: errorMessage,
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          code: constErrors.handler.car.updateCar.mongoError
+        }
+      });
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+  });
 });
