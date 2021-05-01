@@ -30,6 +30,8 @@ container.register({
 
 const app = container.resolve('express')();
 
+const log = container.resolve('logger')(app);
+
 app.use('/_health/ping', (req, res) => {
   res.status = 200;
   res.send({
@@ -44,4 +46,15 @@ app
 
 const server = app.listen(config.GLOBAL.PORT);
 
-module.exports = server;
+server.stopServer = async () => {
+  return new Promise(async resolve => {
+    const mongoDbClient = container.resolve('mongoClient');
+    await mongoDbClient.disconnect();
+    server.close(resolve);
+  });
+};
+
+log.info('successfully started application server', {
+  port: config.GLOBAL.PORT
+});
+module.exports = { server, container };

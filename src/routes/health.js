@@ -10,9 +10,9 @@ module.exports = ({
    */
   router.get('/current', async (req, res) => {
     const healthy = await mongoClient.test();
-    res.state = healthy ? OK : INTERNAL_SERVER_ERROR;
-
-    res.json({ mongo: { healthy } });
+    res
+      .status(healthy ? OK : INTERNAL_SERVER_ERROR)
+      .json({ mongo: { healthy } });
   });
 
   return router;

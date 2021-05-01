@@ -33,7 +33,8 @@
     "nodemon": "2.0.4",
     "prettier": "2.0.5",
     "prettier-eslint-cli": "5.0.0",
-    "supertest": "4.0.2"
+    "supertest": "4.0.2",
+    "mongodb-memory-server": "6.9.6"
   },
   "scripts": {
     "format": "prettier-eslint --write \"src/**/*.js\" \"test/**/*.js\"",
@@ -47,8 +48,8 @@
     "release:minor": "npm version minor --no-git-tag-version && git add . && git commit -m \"🔖  Bump minor version\"",
     "release:major": "npm version major --no-git-tag-version && git add . && git commit -m \"🔖  Bump major version\"",
     "dev": "export NODE_ENV=DEV && nodemon --inspect=0.0.0.0:4002 src/index.js",
-    "start": "export NODE_ENV=PRODUCTION && node src/index.js",
-    "dev-db": "docker-compose --env-file ./.env.dev up --force-recreate -d"
+    "start": "node src/index.js",
+    "dev-docker": "docker-compose --env-file .env.docker up --force-recreate"
   },
   "config": {
     "commitizen": {
@@ -57,7 +58,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "yarn lint && yarn duplicated && yarn test:push"
+      "pre-push": "yarn lint && yarn duplicated && yarn test"
     }
   },
   "jest-junit": {

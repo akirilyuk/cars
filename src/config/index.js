@@ -1,7 +1,3 @@
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV.toLowerCase()}`
-});
-
 module.exports = {
   GLOBAL: {
     PORT: Number(process.env.GLOBAL_PORT) || 3000,
@@ -12,14 +8,13 @@ module.exports = {
         : 'debug'
   },
   MONGO: {
-    USERNAME: process.env.MONGO_USER_NAME || 'user',
-    PASSWORD: process.env.MONGO_USER_PASSWORD || 'password',
-    ADDRESS: process.env.MONGO_ADDRESS || 'localhost',
-    PORT: Number(process.env.MONGO_PORT) || 37017,
+    ADDRESS: process.env.MONGO_ADDRESS || '127.0.0.1',
+    PORT: Number(process.env.MONGO_PORT) || 27017,
     DATABASE_NAME: process.env.MONGO_DATABASE_NAME || 'cars',
     OPTIONS: {
       connectTimeoutMS: Number(process.env.MONGO_CONNECTION_TIMEOUT) || 30000,
-      useNewUrlParser: true
+      useNewUrlParser: true,
+      keepAlive: 1
     }
   }
 };
