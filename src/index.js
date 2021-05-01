@@ -4,10 +4,11 @@ const bodyParser = require('body-parser');
 const httpStatus = require('http-status-codes');
 const winston = require('winston');
 const Ajv = require('ajv');
+const { v4: uuid } = require('uuid');
 const { createContainer, asValue, asFunction } = require('awilix');
 
 const { routerCar, routerHealth } = require('./routes');
-const { handlerCar } = require('./handlers');
+const { handlerCar, handlerDefault } = require('./handlers');
 const { ModelCar } = require('./models');
 const { mongoClient, logger } = require('./lib');
 const { ApiError } = require('./util');
@@ -23,6 +24,7 @@ container.register({
   httpStatus: asValue(httpStatus),
   mongoose: asValue(mongoose),
   ajv: asValue(ajv),
+  uuid: asValue(uuid),
 
   ModelCar: asFunction(ModelCar).singleton(),
   express: asValue(express),
@@ -35,6 +37,7 @@ container.register({
   routerHealth: asFunction(routerHealth).singleton(),
 
   handlerCar: asFunction(handlerCar).singleton(),
+  handlerDefault: asFunction(handlerDefault).singleton(),
 
   ApiError: asValue(ApiError),
 
@@ -44,37 +47,18 @@ container.register({
 const app = container.resolve('express')();
 
 const log = container.resolve('logger')(app);
-
-app.use('/health/ping', (req, res) => {
-  res.status = 200;
-  res.send({
-    message: 'pong'
-  });
-});
-
+const { preRequest, successHandler, errorHandler } = container.resolve(
+  'handlerDefault'
+);
 app
   .use(bodyParser.json())
+  .use(preRequest)
   .use('/api', container.resolve('routerCar'))
-  .use('/health', container.resolve('routerHealth'));
+  .use('/health', container.resolve('routerHealth'))
+  .use(successHandler);
 
-// eslint-disable-next-line max-params
-app.use('/api', (error, req, res, next) => {
-  const statusCode = error.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-  const errorObject = {
-    message: error.message,
-    status: error.statusCode,
-    code: error.errorCode
-  };
-  res.status(statusCode).json({
-    error: errorObject
-  });
-  log.error('encountered api error', {
-    error: { ...errorObject, stack: error.stack },
-    statusCode
-  });
-
-  next();
-});
+// only use the error handler for /api endpoint since we expect a different payload on health errors
+app.use('/api', errorHandler);
 
 const server = app.listen(config.GLOBAL.PORT);
 
