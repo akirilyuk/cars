@@ -600,4 +600,164 @@ describe('test health api', () => {
       });
     });
   });
+  describe('test POST /api/car', () => {
+    const path = `/api/car/`;
+    it('should return 200 and create a new car on valid input', async () => {
+      const carPayload = {
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      };
+      const { body, status } = await supertest(app).post(path).send(carPayload);
+
+      expect(status).toEqual(httpStatus.CREATED);
+
+      expect(body).toEqual({ id: expect.toBeString(), ...carPayload });
+
+      const createdCarInDB = await ModelCar.findById(body.id);
+
+      expect(createdCarInDB.toJSON()).toEqual(body);
+    });
+    it('should return 500 and return error if saving car to DB failed', async () => {
+      const carPayload = {
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      };
+      const errorMessage = 'some  mongo error';
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+      saveSpy.mockRejectedValueOnce(new Error(errorMessage));
+
+      const { body, status } = await supertest(app).post(path).send(carPayload);
+
+      expect(status).toEqual(httpStatus.INTERNAL_SERVER_ERROR);
+
+      expect(body).toEqual({
+        error: {
+          message: errorMessage,
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          code: constErrors.handler.car.createCar.mongoError
+        }
+      });
+    });
+    it('should return 400 and return error if not all properties provided ', async () => {
+      const carPayload = {
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        automaticTransmission: false
+      };
+
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+
+      const { body, status } = await supertest(app).post(path).send(carPayload);
+
+      expect(status).toEqual(httpStatus.BAD_REQUEST);
+
+      expect(body).toEqual({
+        error: {
+          message: expect.toBeString(),
+          status: httpStatus.BAD_REQUEST,
+          code: constErrors.handler.car.validateCreate.validationError
+        }
+      });
+
+      expect(saveSpy).not.toHaveBeenCalled();
+    });
+    it('should return 400 and return error if not property values not in enum propertie ', async () => {
+      const carPayload = {
+        color: 'purple',
+        vendor: 'kia',
+        seats: 1000,
+        cabrio: true,
+        automaticTransmission: false
+      };
+
+      const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
+
+      const { body, status } = await supertest(app).post(path).send(carPayload);
+
+      expect(status).toEqual(httpStatus.BAD_REQUEST);
+
+      expect(body).toEqual({
+        error: {
+          message: expect.toBeString(),
+          status: httpStatus.BAD_REQUEST,
+          code: constErrors.handler.car.validateCreate.validationError
+        }
+      });
+
+      expect(saveSpy).not.toHaveBeenCalled();
+    });
+  });
+  describe('test GET /api/car', () => {
+    const path = '/api/car';
+    it('should return 200 and right number ob meta count in db', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+      const existingCarModel2 = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.RED,
+        vendor: ModelCar.ENUMS.VENDOR.BMW,
+        seats: ModelCar.ENUMS.SEATS.TWO,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel2.save();
+      const existingCarModel3 = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.BMW,
+        seats: ModelCar.ENUMS.SEATS.SIX,
+        cabrio: false,
+        automaticTransmission: false
+      });
+      await existingCarModel3.save();
+      const existingCarModel4 = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.GREEN,
+        vendor: ModelCar.ENUMS.VENDOR.MERCEDES,
+        seats: ModelCar.ENUMS.SEATS.SIX,
+        cabrio: false,
+        automaticTransmission: true
+      });
+      await existingCarModel4.save();
+      const { body, status } = await supertest(app).get(path);
+
+      expect(status).toEqual(httpStatus.OK);
+      expect(body).toEqual({
+        count: 4,
+        color: {
+          blue: 2,
+          green: 1,
+          red: 1,
+          yellow: 0
+        },
+        vendor: {
+          bmw: 2,
+          mercedes: 1,
+          volkswagen: 1
+        },
+        seats: {
+          2: 1,
+          4: 1,
+          6: 2
+        },
+        cabrio: {
+          true: 2,
+          false: 2
+        },
+        automaticTransmission: {
+          true: 1,
+          false: 3
+        }
+      });
+    });
+  });
 });

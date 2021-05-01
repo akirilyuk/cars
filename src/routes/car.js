@@ -1,13 +1,15 @@
 module.exports = ({
   express,
-  httpStatus: { OK },
   handlerCar: {
     findCarById,
     returnCar,
     updateCar,
+    validateCreate,
     validateUpdate,
     validateId,
-    deleteCar
+    deleteCar,
+    createCar,
+    getCars
     // updateCarWithFindOneAndUpdate //remove comment here to use updateCarWithFindOneAndUpdate
   }
 }) => {
@@ -16,19 +18,12 @@ module.exports = ({
   /**
    * Get all metadata of all cars
    */
-  router.get('/car', async (req, res) => {
-    res.state = OK;
-    res.json({});
-  });
+  router.get('/car', getCars);
 
   /**
    * Create a new car
    */
-  router.post('/car', (req, res) => {
-    res.state = OK;
-
-    res.json({});
-  });
+  router.post('/car', validateCreate, createCar);
 
   /**
    * Get car by ID

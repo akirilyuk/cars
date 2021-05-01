@@ -1,20 +1,35 @@
 module.exports = ({
   ModelCar,
   ApiError,
-  httpStatus: { OK, NOT_FOUND, INTERNAL_SERVER_ERROR, BAD_REQUEST },
+  httpStatus: { OK, NOT_FOUND, INTERNAL_SERVER_ERROR, BAD_REQUEST, CREATED },
   constErrors: {
     handler: {
       car: {
         findCarById,
         updateCar,
+        validateCreate,
         validateUpdate,
         validateId,
         updateCarWithFindOneAndUpdate,
-        deleteCar
+        deleteCar,
+        createCar,
+        getCars
       }
     }
   }
 }) => ({
+  getCars: async (req, res, next) => {
+    let error;
+    try {
+      const carsMeta = await ModelCar.getAllCarsMeta({});
+
+      res.status(OK).send(carsMeta);
+    } catch (err) {
+      error = new ApiError(err, getCars.mongoError, INTERNAL_SERVER_ERROR);
+    }
+
+    next(error);
+  },
   /**
    * Find one car in the DB by the provided car id. If we can't find the car in the DB, throw a not found error,
    * on any DB error we will throw a mongoError and 500, else if all succeeded, we will append the mongo car document
@@ -55,6 +70,19 @@ module.exports = ({
     const { car } = res.locals;
     res.status(OK).json(car.toJSON());
     next();
+  },
+
+  createCar: async (req, res, next) => {
+    const { body } = req;
+    const car = new ModelCar(body);
+    let error;
+    try {
+      await car.save();
+      res.status(CREATED).json(car.toJSON());
+    } catch (err) {
+      error = new ApiError(err, createCar.mongoError, INTERNAL_SERVER_ERROR);
+    }
+    next(error);
   },
   /**
    * Updates an existing car in the DB. Note that we are using the save() method of prefetched model from the mongoDB.
@@ -180,6 +208,30 @@ module.exports = ({
         new ApiError(
           { message: errors },
           validateUpdate.validationError,
+          BAD_REQUEST
+        )
+      );
+    }
+  },
+
+  /**
+   * Validate the update body by calling the static validateUpdate method on the ModelCar class. If the validation fails, errors
+   * equals to the stringified validation errors from AJV. Else if no validation errors are resent, we will proceed with the next request
+   * @param req {IncomingMessage} incoming request message
+   * @param res {ServerResponse} express server response
+   * @param next {function} callback function to trigger next route
+   */
+  validateCreate: (req, res, next) => {
+    const { body } = req;
+
+    const errors = ModelCar.validateCreate(body);
+    if (!errors) {
+      next();
+    } else {
+      next(
+        new ApiError(
+          { message: errors },
+          validateCreate.validationError,
           BAD_REQUEST
         )
       );

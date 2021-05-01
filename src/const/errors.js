@@ -29,6 +29,17 @@ module.exports = {
         notFound: 'com.akirilyuk.cars.errors.handler.car.delete-car.not-found',
         mongoError:
           'com.akirilyuk.cars.errors.handler.car.delete-car.mongo-error'
+      },
+      createCar: {
+        mongoError:
+          'com.akirilyuk.cars.errors.handler.car.create-car.mongo-error'
+      },
+      validateCreate: {
+        validationError:
+          'com.akirilyuk.cars.errors.handler.car.validate-create.validation-error'
+      },
+      getCars: {
+        mongoError: 'com.akirilyuk.cars.errors.handler.car.get-cars.mongo-error'
       }
     }
   }

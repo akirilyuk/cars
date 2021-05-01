@@ -13,12 +13,15 @@ module.exports = ({ mongoose, logger, config: { MONGO } }) => {
     }
 
     /**
-     * Initializes the internal connection to mongo db if not already created
+     * Initializes the internal connection to mongo db if not already created.
+     * If we fail to connect to the database, for whatever reason, we still set mongoClient to intiialized,
+     * however all requests will fail. This is to ensure that the actual connection is working on start.
      * @return {Promise<boolean>}
      */
     async init() {
       if (!this.initialized) {
         const connectString = `mongodb://${MONGO.ADDRESS}:${MONGO.PORT}/${MONGO.DATABASE_NAME}`;
+        let error;
         try {
           this.connection = await mongoose.connect(
             connectString,
@@ -27,15 +30,18 @@ module.exports = ({ mongoose, logger, config: { MONGO } }) => {
           mongoose.connection.on('error', error => {
             this.log.error('encountered mongo error', { error });
           });
-          this.initialized = true;
           this.log.info('successfully connected to mongo db', {
             connectString
           });
-        } catch (error) {
+        } catch (err) {
           this.log.error('could not connect to db', {
-            error: error.message,
+            error: err.message,
             connectString
           });
+          error = err;
+        }
+        this.initialized = true;
+        if (error) {
           throw error;
         }
       }
