@@ -13,6 +13,7 @@ describe('test health api', () => {
   beforeEach(async () => {
     // always reset all critical modules to do not have side effects between the different test runs...
     jest.resetModules();
+    jest.clearAllMocks();
     mongoose = require('mongoose');
     const { MongoMemoryServer } = require('mongodb-memory-server');
     mongod = new MongoMemoryServer({
@@ -24,12 +25,6 @@ describe('test health api', () => {
     });
     // wait until mongo memory server connection is established
     await mongod.getUri();
-
-    // always start a new server instance to have a clean state
-    const { server, container } = require('../../src');
-    app = server;
-    awilixContainer = container;
-    jest.clearAllMocks();
   });
 
   afterEach(async () => {
@@ -41,6 +36,10 @@ describe('test health api', () => {
   describe('test GET /health/current', () => {
     const path = `/health/current`;
     it('should return 500 if mongodb connection is unhealthy', async () => {
+      // always start a new server instance to have a clean state
+      const { server, container } = require('../../src');
+      app = server;
+      awilixContainer = container;
       // first we do the first health check => we init the db connection etc
       const { body, status } = await supertest(app).get(path);
       expect(status).toEqual(httpStatus.OK);
@@ -59,7 +58,29 @@ describe('test health api', () => {
       expect(status2).toEqual(httpStatus.INTERNAL_SERVER_ERROR);
       expect(body2).toEqual({ mongo: { healthy: false } });
     });
+    it('should return 500 if mongodb connection is unhealthy because connect failed', async () => {
+      const connectSpy = jest.spyOn(mongoose, 'connect');
+      connectSpy.mockRejectedValueOnce(new Error('connection error'));
+
+      // always start a new server instance to have a clean state
+      const { server, container } = require('../../src');
+      app = server;
+      awilixContainer = container;
+
+      // verify that we are really disconnected and are not faking the healthy connection...
+      expect(mongoose.STATES[mongoose.connection.readyState]).toEqual(
+        'disconnected'
+      );
+
+      const { body: body2, status: status2 } = await supertest(app).get(path);
+      expect(status2).toEqual(httpStatus.INTERNAL_SERVER_ERROR);
+      expect(body2).toEqual({ mongo: { healthy: false } });
+    });
     it('should return 200 if mongodb connection is healthy', async () => {
+      // always start a new server instance to have a clean state
+      const { server, container } = require('../../src');
+      app = server;
+      awilixContainer = container;
       const { body, status } = await supertest(app).get(path);
       expect(status).toEqual(httpStatus.OK);
       expect(body).toEqual({ mongo: { healthy: true } });

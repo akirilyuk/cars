@@ -7,15 +7,15 @@
   "description": "have fun with cars",
   "repository": "https://github.com/s1ckn3zz1337/cars",
   "dependencies": {
+    "ajv": "^8.2.0",
     "awilix": "4.2.6",
-    "dotenv": "8.2.0",
-    "uuid": "8.2.0",
-    "winston": "3.3.3",
-    "mongoose": "5.12.7",
-    "express": "4.17.1",
-    "ajv": "8.2.0",
     "body-parser": "1.19.0",
-    "http-status-codes": "2.1.4"
+    "dotenv": "8.2.0",
+    "express": "4.17.1",
+    "http-status-codes": "2.1.4",
+    "mongoose": "5.12.7",
+    "uuid": "8.2.0",
+    "winston": "3.3.3"
   },
   "devDependencies": {
     "commitizen": "4.1.2",
@@ -30,11 +30,11 @@
     "jest": "26.6.3",
     "jest-extended": "0.11.5",
     "jsinspect": "0.12.7",
+    "mongodb-memory-server": "6.9.6",
     "nodemon": "2.0.4",
     "prettier": "2.0.5",
     "prettier-eslint-cli": "5.0.0",
-    "supertest": "4.0.2",
-    "mongodb-memory-server": "6.9.6"
+    "supertest": "4.0.2"
   },
   "scripts": {
     "format": "prettier-eslint --write \"src/**/*.js\" \"test/**/*.js\"",
@@ -42,7 +42,7 @@
     "outofdate": "yarn outdated",
     "duplicated": "jsinspect -t 30",
     "lint": "eslint .",
-    "test": "export NODE_ENV=TEST && yarn run jest --maxWorkers=50%",
+    "test": "export NODE_ENV=TEST && yarn run jest -i",
     "commit": "git-cz",
     "release:patch": "npm version patch --no-git-tag-version && git add . && git commit -m \"🔖  Bump patch version\"",
     "release:minor": "npm version minor --no-git-tag-version && git add . && git commit -m \"🔖  Bump minor version\"",
