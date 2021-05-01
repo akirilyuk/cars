@@ -1,9 +1,9 @@
 version: "3.9"
 
 services:
-  mongo:
+  mongodb:
     image: mongo:latest
-    container_name: mongo
+    container_name: mongodb
     restart: always
     environment:
       MONGO_INITDB_DATABASE: "cars"
@@ -11,14 +11,23 @@ services:
       - 27017:27017
     volumes:
       - ./db:/data/db
-  #app:
-    #build: .
-    #ports:
-    #  - 3000:3000
-    #environment:
-     # MONGO_ADDRESS: "mongo"
-      #MONGO_PORT: 27017
-      #MONGO_DATABASE_NAME: "cars"
-     # NODE_ENV: "production"
-      #GLOBAL_PORT: 3000
+  app:
+    build: .
+    depends_on:
+      - mongodb
+    ports:
+      - 3000:3000
+    command: sh -c "/wait && yarn start"
+    links:
+      - mongodb
+    environment:
+      MONGO_ADDRESS: "mongodb"
+      MONGO_PORT: 27017
+      MONGO_DATABASE_NAME: "cars"
+      NODE_ENV: "production"
+      GLOBAL_PORT: 3000
+      WAIT_HOSTS: mongodb:27017
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 5
+      WAIT_HOST_CONNECT_TIMEOUT: 30
 
