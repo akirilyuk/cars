@@ -1,4 +1,5 @@
 /* eslint-disable global-require */
+/* eslint-disable no-underscore-dangle */
 
 const supertest = require('supertest');
 const httpStatus = require('http-status-codes');
@@ -8,7 +9,6 @@ const { constErrors } = require('../../src/const');
 let app;
 let mongod;
 let mongoose;
-let connection;
 let ModelCar;
 describe('test health api', () => {
   beforeEach(async () => {
@@ -28,7 +28,7 @@ describe('test health api', () => {
     await mongod.getUri();
     const connectString = `mongodb://${MONGO.ADDRESS}:${MONGO.PORT}/${MONGO.DATABASE_NAME}`;
 
-    connection = await mongoose.connect(connectString, MONGO.OPTIONS);
+    await mongoose.connect(connectString, MONGO.OPTIONS);
     mongoose.connection.on('error', error => {
       this.log.error('encountered mongo error', { error });
     });

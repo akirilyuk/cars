@@ -10,42 +10,50 @@ module.exports = ({ mongoose, logger, config: { MONGO } }) => {
       this.connection = null;
       this.initialized = false;
       this.log = logger('MongoClient');
+      this.initializationPromise = null;
     }
 
     /**
      * Initializes the internal connection to mongo db if not already created.
      * If we fail to connect to the database, for whatever reason, we still set mongoClient to intiialized,
      * however all requests will fail. This is to ensure that the actual connection is working on start.
+     *
+     * If we already have called init once, we will create a internal initialization promise to ensure we
+     * only have connected to the mongoose DB once
      * @return {Promise<boolean>}
      */
     async init() {
-      if (!this.initialized) {
-        const connectString = `mongodb://${MONGO.ADDRESS}:${MONGO.PORT}/${MONGO.DATABASE_NAME}`;
-        let error;
-        try {
-          this.connection = await mongoose.connect(
-            connectString,
-            MONGO.OPTIONS
-          );
-          mongoose.connection.on('error', error => {
-            this.log.error('encountered mongo error', { error });
-          });
-          this.log.info('successfully connected to mongo db', {
-            connectString
-          });
-        } catch (err) {
-          this.log.error('could not connect to db', {
-            error: err.message,
-            connectString
-          });
-          error = err;
-        }
-        this.initialized = true;
-        if (error) {
-          throw error;
-        }
+      if (!this.initialized && !this.initializationPromise) {
+        this.initializationPromise = new Promise(async (resolve, reject) => {
+          const connectString = `mongodb://${MONGO.ADDRESS}:${MONGO.PORT}/${MONGO.DATABASE_NAME}`;
+          let error;
+          try {
+            this.connection = await mongoose.connect(
+              connectString,
+              MONGO.OPTIONS
+            );
+            mongoose.connection.on('error', err => {
+              this.log.error('encountered mongo error', { error: err.message });
+            });
+            this.log.info('successfully connected to mongo db', {
+              connectString
+            });
+          } catch (err) {
+            this.log.error('could not connect to db', {
+              error: err.message,
+              connectString
+            });
+            error = err;
+          }
+          this.initialized = true;
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
       }
-      return true;
+      return this.initializationPromise;
     }
 
     /**
@@ -62,7 +70,7 @@ module.exports = ({ mongoose, logger, config: { MONGO } }) => {
         }
         throw new Error('failed to check health');
       } catch (error) {
-        this.log.error('failed to check health', { error });
+        this.log.error('failed to check health', { error: error.message });
       }
       return false;
     }
@@ -76,7 +84,9 @@ module.exports = ({ mongoose, logger, config: { MONGO } }) => {
         try {
           await this.connection.disconnect();
         } catch (error) {
-          this.log.error('failed to stop mongo connection health', { error });
+          this.log.error('failed to stop mongo connection health', {
+            error: error.message
+          });
         }
       }
     }
