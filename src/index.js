@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const httpStatus = require('http-status-codes');
 const winston = require('winston');
+const Ajv = require('ajv');
 const { createContainer, asValue, asFunction } = require('awilix');
 
 const { routerCar, routerHealth } = require('./routes');
@@ -13,12 +14,15 @@ const { ApiError } = require('./util');
 const { constErrors } = require('./const');
 const config = require('./config');
 
+const ajv = new Ajv();
+
 const container = createContainer();
 
 container.register({
   winston: asValue(winston),
   httpStatus: asValue(httpStatus),
   mongoose: asValue(mongoose),
+  ajv: asValue(ajv),
 
   ModelCar: asFunction(ModelCar).singleton(),
   express: asValue(express),

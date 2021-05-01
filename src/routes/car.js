@@ -1,7 +1,7 @@
 module.exports = ({
   express,
   httpStatus: { OK },
-  handlerCar: { findCarById, returnCar, updateCar }
+  handlerCar: { findCarById, returnCar, updateCar, validateUpdate, validateId }
 }) => {
   const router = express.Router();
 
@@ -38,7 +38,14 @@ module.exports = ({
   /**
    * Update one car
    */
-  router.put('/car/:id', findCarById, updateCar, returnCar);
+  router.put(
+    '/car/:id',
+    validateId,
+    validateUpdate,
+    findCarById,
+    updateCar,
+    returnCar
+  );
 
   return router;
 };
