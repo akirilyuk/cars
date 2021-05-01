@@ -758,6 +758,60 @@ describe('test health api', () => {
           false: 3
         }
       });
+
+      // ensure that we really have 4 cars in the database ...
+      const actualCarsInDB = await ModelCar.find({});
+      expect(body.count).toEqual(actualCarsInDB.length);
+    });
+    it('should return 500 and right error code on mongo error during finding the cars', async () => {
+      const existingCarModel = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.VOLKSWAGEN,
+        seats: ModelCar.ENUMS.SEATS.FOUR,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel.save();
+      const existingCarModel2 = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.RED,
+        vendor: ModelCar.ENUMS.VENDOR.BMW,
+        seats: ModelCar.ENUMS.SEATS.TWO,
+        cabrio: true,
+        automaticTransmission: false
+      });
+      await existingCarModel2.save();
+      const existingCarModel3 = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.BLUE,
+        vendor: ModelCar.ENUMS.VENDOR.BMW,
+        seats: ModelCar.ENUMS.SEATS.SIX,
+        cabrio: false,
+        automaticTransmission: false
+      });
+      await existingCarModel3.save();
+      const existingCarModel4 = new ModelCar({
+        color: ModelCar.ENUMS.COLOR.GREEN,
+        vendor: ModelCar.ENUMS.VENDOR.MERCEDES,
+        seats: ModelCar.ENUMS.SEATS.SIX,
+        cabrio: false,
+        automaticTransmission: true
+      });
+      await existingCarModel4.save();
+
+      const errorMessage = 'some mongo error';
+      const findSpy = jest.spyOn(ModelCar, 'find');
+      findSpy.mockRejectedValueOnce(new Error(errorMessage));
+
+      const { body, status } = await supertest(app).get(path);
+
+      expect(status).toEqual(httpStatus.INTERNAL_SERVER_ERROR);
+
+      expect(body).toEqual({
+        error: {
+          message: errorMessage,
+          status: httpStatus.INTERNAL_SERVER_ERROR,
+          code: constErrors.handler.car.getCars.mongoError
+        }
+      });
     });
   });
 });
