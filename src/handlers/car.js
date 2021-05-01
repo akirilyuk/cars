@@ -36,7 +36,6 @@ module.exports = ({
     } catch (err) {
       error = new ApiError(err, findCarById.mongoError, INTERNAL_SERVER_ERROR);
     }
-
     return next(error);
   },
   /**
@@ -69,6 +68,8 @@ module.exports = ({
    *
    * Because of this I have decided to go with the second approach and hope that this was the right decisions and per requirements
    * to only update changed values rather than doing a full replace.
+   *
+   * https://mongoosejs.com/docs/documents.html#updating-using-save
    *
    * https://mongoosejs.com/docs/tutorials/findoneandupdate.html
    * https://mongoosejs.com/docs/api.html#model_Model.updateOne

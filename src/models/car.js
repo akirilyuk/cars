@@ -87,7 +87,11 @@ module.exports = ({ mongoose, ajv }) => {
   };
 
   /**
-   * Create and validate the
+   * Create and validate the payload by the proivided ajv validation. Why are we not using the build in mongoose validations?
+   *
+   * https://mongoosejs.com/docs/documents.html#validating
+   *
+   * Because of speed?
    * @param scheme {object} ajv schema validation object
    * @param data {object} request body data
    * @return {string|null}
