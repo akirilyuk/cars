@@ -83,6 +83,7 @@ module.exports = ({ logger, uuid, httpStatus }) => ({
       endTime,
       startTime,
       statusCode,
+      errorCode: error.errorCode,
       error: error.message,
       trace: error.trace || error.stack
     });

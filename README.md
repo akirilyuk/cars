@@ -127,6 +127,7 @@ Furthermore, once the request handling is finished, the request duration is logg
 Also, the application exposes a health route to get the status of the external dependencies, (mongodb) under ``/health/current``.
 To check if the server is up you can use ``/health/ping``;
 
+Request start:
 ```json
 {
   "loggerContext":"request",
@@ -140,6 +141,24 @@ To check if the server is up you can use ``/health/ping``;
 }
 ```
 
+Request finished (success):
+```json
+{
+   "loggerContext":"request",
+   "requestId":"bcd73141-e6f0-445a-83fa-1866f6756f3d",
+   "url":"/api/v1/car/608ee38cb184c366e39bf215",
+   "method":"GET",
+   "duration":3,
+   "endTime":1619977100482,
+   "startTime":1619977100479,
+   "statusCode":200,
+   "level":"info",
+   "message":"finished request",
+   "timestamp":"2021-05-02T17:38:20.482Z"
+}
+```
+
+Request error (client):
 ```json
 {
    "loggerContext":"request",
@@ -150,11 +169,32 @@ To check if the server is up you can use ``/health/ping``;
    "endTime":1619975280944,
    "startTime":1619975280935,
    "statusCode":400,
+   "errorCode":"com.akirilyuk.cars.errors.handler.car.v1.validate-id.mismatch",
    "error":"provided ids do not match",
    "trace":"Error: provided ids do not match\n    at validateId (/Users/akirilyuk/GIT/cars/src/handlers/v1/car.js:268:11)\n    at Layer.handle [as handle_request] (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/layer.js:95:5)\n    at next (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/route.js:137:13)\n    at Route.dispatch (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/route.js:112:3)\n    at Layer.handle [as handle_request] (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/layer.js:95:5)\n    at /Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:281:22\n    at param (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:354:14)\n    at param (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:365:14)\n    at Function.process_params (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:410:3)\n    at next (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:275:10)\n    at Function.handle (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:174:3)\n    at router (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:47:12)\n    at Layer.handle [as handle_request] (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:317:13)\n    at /Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:284:7\n    at Function.process_params (/Users/akirilyuk/GIT/cars/node_modules/express/lib/router/index.js:335:12)",
    "level":"warn",
    "message":"finished request with error",
    "timestamp":"2021-05-02T17:08:00.944Z"
+}
+```
+
+Request error (server):
+```json
+{
+   "loggerContext":"request",
+   "requestId":"7fdc465a-f317-48c0-aefd-cc64cae4b571",
+   "url":"/api/v1/car",
+   "method":"GET",
+   "duration":1,
+   "endTime":1619977105670,
+   "startTime":1619977105669,
+   "statusCode":500,
+   "errorCode":"com.akirilyuk.cars.errors.handler.car.v1.get-cars.mongo-error",
+   "error":"some mongo error",
+   "trace":"Error: some mongo error\n    at Object.<anonymous> (/Users/akirilyuk/GIT/cars/test/integration/api-cars-v1.test.js:802:37)\n    at processTicksAndRejections (internal/process/task_queues.js:93:5)",
+   "level":"error",
+   "message":"finished request with error",
+   "timestamp":"2021-05-02T17:38:25.670Z"
 }
 ```
 
