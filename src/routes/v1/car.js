@@ -9,7 +9,7 @@ module.exports = ({
     validateId,
     deleteCar,
     createCar,
-    getCars
+    getCarsMeta
     // updateCarWithFindOneAndUpdate //remove comment here to use updateCarWithFindOneAndUpdate
   }
 }) => {
@@ -18,28 +18,28 @@ module.exports = ({
   /**
    * Get all metadata of all cars
    */
-  router.get('/car', getCars);
+  router.get('/v1/car', getCarsMeta);
 
   /**
    * Create a new car
    */
-  router.post('/car', validateCreate, createCar);
+  router.post('/v1/car', validateCreate, createCar);
 
   /**
    * Get car by ID
    */
-  router.get('/car/:id', findCarById, returnCar);
+  router.get('/v1/car/:id', findCarById, returnCar);
 
   /**
    * Delete
    */
-  router.delete('/car/:id', deleteCar);
+  router.delete('/v1/car/:id', deleteCar);
 
   /**
    * Update one car
    */
   router.put(
-    '/car/:id',
+    '/v1/car/:id',
     validateId,
     validateUpdate,
     findCarById, // comment this out to use  updateCarWithFindOneAndUpdate

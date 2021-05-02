@@ -49,7 +49,7 @@
     "release:major": "npm version major --no-git-tag-version && git add . && git commit -m \"🔖  Bump major version\"",
     "dev": "export NODE_ENV=DEV && nodemon --inspect=0.0.0.0:4002 src/index.js",
     "start": "node src/index.js",
-    "dev-docker": "docker-compose --env-file .env.docker up --force-recreate"
+    "docker-compose": "docker-compose up --force-recreate"
   },
   "config": {
     "commitizen": {
@@ -58,7 +58,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "yarn lint && yarn duplicated && yarn test"
+      "pre-push": "yarn lint && yarn duplicated && yarn security && yarn test"
     }
   },
   "jest-junit": {

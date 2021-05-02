@@ -1,6 +1,6 @@
 module.exports = ({ logger, uuid, httpStatus }) => ({
   /**
-   * Creates a local logger instance with a dedicated reqeust context and logger for each request
+   * Creates a local logger instance with a dedicated request context and logger for each request
    * for better tracing of the requests
    * @param req
    * @param res
@@ -84,7 +84,7 @@ module.exports = ({ logger, uuid, httpStatus }) => ({
       startTime,
       statusCode,
       error: error.message,
-      stack: error.stack
+      trace: error.trace || error.stack
     });
 
     next();

@@ -1,7 +1,8 @@
-const routerCar = require('./car');
+const v1 = require('./v1');
+
 const routerHealth = require('./health');
 
 module.exports = {
-  routerCar,
+  ...v1,
   routerHealth
 };

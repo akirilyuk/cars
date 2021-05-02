@@ -47,30 +47,30 @@ describe('test health api', () => {
     await mongod.stop();
   });
 
-  describe('test GET /api/car/:id', () => {
+  describe('test GET /api/v1/car/:id', () => {
     it('should return 404 if desired car not found', async () => {
       // first we do the first health check => we init the db connection etc
-      const path = `/api/car/${mongoose.Types.ObjectId()}`;
+      const path = `/api/v1/car/${mongoose.Types.ObjectId()}`;
       const { body, status } = await supertest(app).get(path);
       expect(status).toEqual(httpStatus.NOT_FOUND);
       expect(body).toEqual({
         error: {
           message: 'could not find car',
           status: httpStatus.NOT_FOUND,
-          code: constErrors.handler.car.findCarById.notFound
+          code: constErrors.handler.car.v1.findCarById.notFound
         }
       });
     });
     it('should return 500 if id not a real mongo object id', async () => {
       // first we do the first health check => we init the db connection etc
-      const path = `/api/car/test`;
+      const path = `/api/v1/car/test`;
       const { body, status } = await supertest(app).get(path);
       expect(status).toEqual(httpStatus.INTERNAL_SERVER_ERROR);
       expect(body).toEqual({
         error: {
           message: expect.toBeString(),
           status: httpStatus.INTERNAL_SERVER_ERROR,
-          code: constErrors.handler.car.findCarById.mongoError
+          code: constErrors.handler.car.v1.findCarById.mongoError
         }
       });
     });
@@ -84,17 +84,17 @@ describe('test health api', () => {
       });
       await existingCarModel.save();
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
       const { body, status } = await supertest(app).get(path);
 
       expect(status).toEqual(httpStatus.OK);
       expect(body).toEqual(existingCarModel.toJSON());
     });
   });
-  describe('test PUT /api/car/:id', () => {
+  describe('test PUT /api/v1/car/:id', () => {
     it('should return 404 if desired car not found', async () => {
       // first we do the first health check => we init the db connection etc
-      const path = `/api/car/${mongoose.Types.ObjectId()}`;
+      const path = `/api/v1/car/${mongoose.Types.ObjectId()}`;
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
       const { body, status } = await supertest(app).get(path);
       expect(status).toEqual(httpStatus.NOT_FOUND);
@@ -102,7 +102,7 @@ describe('test health api', () => {
         error: {
           message: 'could not find car',
           status: httpStatus.NOT_FOUND,
-          code: constErrors.handler.car.findCarById.notFound
+          code: constErrors.handler.car.v1.findCarById.notFound
         }
       });
 
@@ -122,7 +122,7 @@ describe('test health api', () => {
 
       carCopy.vendor = ModelCar.ENUMS.VENDOR.BMW;
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -154,7 +154,7 @@ describe('test health api', () => {
 
       carCopy.color = ModelCar.ENUMS.COLOR.GREEN;
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
       const { body, status } = await supertest(app).put(path).send(carCopy);
@@ -183,7 +183,7 @@ describe('test health api', () => {
 
       carCopy.seats = ModelCar.ENUMS.SEATS.TWO;
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -212,7 +212,7 @@ describe('test health api', () => {
 
       carCopy.cabrio = false;
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -241,7 +241,7 @@ describe('test health api', () => {
 
       carCopy.automaticTransmission = true;
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -267,7 +267,7 @@ describe('test health api', () => {
       });
       await existingCarModel.save();
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -280,7 +280,7 @@ describe('test health api', () => {
         error: {
           message: 'nothing to update',
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.updateCar.noChanges
+          code: constErrors.handler.car.v1.updateCar.noChanges
         }
       });
       expect(saveSpy).toHaveBeenCalledTimes(0);
@@ -299,7 +299,7 @@ describe('test health api', () => {
 
       carCopy.automaticTransmission = true;
 
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -312,7 +312,7 @@ describe('test health api', () => {
         error: {
           message: errorMessage,
           status: httpStatus.INTERNAL_SERVER_ERROR,
-          code: constErrors.handler.car.updateCar.mongoError
+          code: constErrors.handler.car.v1.updateCar.mongoError
         }
       });
       expect(saveSpy).toHaveBeenCalledTimes(1);
@@ -330,7 +330,7 @@ describe('test health api', () => {
       const carJSON = existingCarModel.toJSON();
 
       carJSON.color = 'random color';
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -342,7 +342,7 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateUpdate.validationError
+          code: constErrors.handler.car.v1.validateUpdate.validationError
         }
       });
       expect(saveSpy).not.toHaveBeenCalled();
@@ -361,7 +361,7 @@ describe('test health api', () => {
       const carJSON = existingCarModel.toJSON();
 
       carJSON.vendor = 'random vendor';
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -373,7 +373,7 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateUpdate.validationError
+          code: constErrors.handler.car.v1.validateUpdate.validationError
         }
       });
       expect(saveSpy).not.toHaveBeenCalled();
@@ -392,7 +392,7 @@ describe('test health api', () => {
       const carJSON = existingCarModel.toJSON();
 
       carJSON.seats = 'random seats string';
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -404,7 +404,7 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateUpdate.validationError
+          code: constErrors.handler.car.v1.validateUpdate.validationError
         }
       });
       expect(saveSpy).not.toHaveBeenCalled();
@@ -423,7 +423,7 @@ describe('test health api', () => {
       const carJSON = existingCarModel.toJSON();
 
       carJSON.cabrio = 'random cabrio string';
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -435,7 +435,7 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateUpdate.validationError
+          code: constErrors.handler.car.v1.validateUpdate.validationError
         }
       });
       expect(saveSpy).not.toHaveBeenCalled();
@@ -454,7 +454,7 @@ describe('test health api', () => {
       const carJSON = existingCarModel.toJSON();
 
       carJSON.automaticTransmission = 'random transmission string';
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -466,7 +466,7 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateUpdate.validationError
+          code: constErrors.handler.car.v1.validateUpdate.validationError
         }
       });
       expect(saveSpy).not.toHaveBeenCalled();
@@ -488,7 +488,7 @@ describe('test health api', () => {
         id: carCopy.id,
         automaticTransmission: true
       };
-      const path = `/api/car/${existingCarModel._id.toString()}`;
+      const path = `/api/v1/car/${existingCarModel._id.toString()}`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -523,7 +523,7 @@ describe('test health api', () => {
       const carJSON = existingCarModel.toJSON();
 
       carJSON.automaticTransmission = true;
-      const path = `/api/car/another-random-id`;
+      const path = `/api/v1/car/another-random-id`;
 
       // create the spy after populated the db
       const saveSpy = jest.spyOn(ModelCar.prototype, 'save');
@@ -535,14 +535,14 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateId.mismatch
+          code: constErrors.handler.car.v1.validateId.mismatch
         }
       });
       expect(saveSpy).not.toHaveBeenCalled();
       expect(findByIdSpy).not.toHaveBeenCalled();
     });
   });
-  describe('test DELETE /api/car/:id', () => {
+  describe('test DELETE /api/v1/car/:id', () => {
     it('should return 200 and delete car from database if exists', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -555,7 +555,7 @@ describe('test health api', () => {
 
       const carCopy = existingCarModel.toJSON();
 
-      const path = `/api/car/${carCopy.id}`;
+      const path = `/api/v1/car/${carCopy.id}`;
 
       const { body, status } = await supertest(app).delete(path);
 
@@ -567,7 +567,7 @@ describe('test health api', () => {
       expect(existingCarModelInDB).toBeNull();
     });
     it('should return 404 and not delete car from database if does not exist in DB', async () => {
-      const path = `/api/car/${mongoose.Types.ObjectId()}`;
+      const path = `/api/v1/car/${mongoose.Types.ObjectId()}`;
 
       const { body, status } = await supertest(app).delete(path);
 
@@ -576,12 +576,12 @@ describe('test health api', () => {
         error: {
           message: 'item not found',
           status: httpStatus.NOT_FOUND,
-          code: constErrors.handler.car.deleteCar.notFound
+          code: constErrors.handler.car.v1.deleteCar.notFound
         }
       });
     });
     it('should return 500 on DB error', async () => {
-      const path = `/api/car/${mongoose.Types.ObjectId()}`;
+      const path = `/api/v1/car/${mongoose.Types.ObjectId()}`;
 
       const deleteOneSpy = jest.spyOn(ModelCar, 'deleteOne');
 
@@ -595,13 +595,13 @@ describe('test health api', () => {
         error: {
           message: errorMessage,
           status: httpStatus.INTERNAL_SERVER_ERROR,
-          code: constErrors.handler.car.deleteCar.mongoError
+          code: constErrors.handler.car.v1.deleteCar.mongoError
         }
       });
     });
   });
-  describe('test POST /api/car', () => {
-    const path = `/api/car/`;
+  describe('test POST /api/v1/car', () => {
+    const path = `/api/v1/car/`;
     it('should return 200 and create a new car on valid input', async () => {
       const carPayload = {
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -640,7 +640,7 @@ describe('test health api', () => {
         error: {
           message: errorMessage,
           status: httpStatus.INTERNAL_SERVER_ERROR,
-          code: constErrors.handler.car.createCar.mongoError
+          code: constErrors.handler.car.v1.createCar.mongoError
         }
       });
     });
@@ -661,7 +661,7 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateCreate.validationError
+          code: constErrors.handler.car.v1.validateCreate.validationError
         }
       });
 
@@ -686,15 +686,15 @@ describe('test health api', () => {
         error: {
           message: expect.toBeString(),
           status: httpStatus.BAD_REQUEST,
-          code: constErrors.handler.car.validateCreate.validationError
+          code: constErrors.handler.car.v1.validateCreate.validationError
         }
       });
 
       expect(saveSpy).not.toHaveBeenCalled();
     });
   });
-  describe('test GET /api/car', () => {
-    const path = '/api/car';
+  describe('test GET /api/v1/car', () => {
+    const path = '/api/v1/car';
     it('should return 200 and right number ob meta count in db', async () => {
       const existingCarModel = new ModelCar({
         color: ModelCar.ENUMS.COLOR.BLUE,
@@ -809,7 +809,7 @@ describe('test health api', () => {
         error: {
           message: errorMessage,
           status: httpStatus.INTERNAL_SERVER_ERROR,
-          code: constErrors.handler.car.getCars.mongoError
+          code: constErrors.handler.car.v1.getCars.mongoError
         }
       });
     });

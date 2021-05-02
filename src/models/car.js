@@ -180,7 +180,7 @@ module.exports = ({ mongoose, ajv }) => {
    * and count each value increasing count for the occurance of each property inside the empty metadata by one.
    *
    * For an complete example of the returned payload see the integration test inside
-   *  api-cars.test.js -> 'test GET /api/car' -> 'should return 200 and right number ob meta count in db'
+   *  api-cars-v1.test.js -> 'test GET /api/car' -> 'should return 200 and right number ob meta count in db'
    *
    * @return {}
    */
