@@ -25,23 +25,23 @@ container.register({
   mongoose: asValue(mongoose),
   ajv: asValue(ajv),
   uuid: asValue(uuid),
+  express: asValue(express),
 
   ModelCar: asFunction(ModelCar).singleton(),
-  express: asValue(express),
+
   config: asValue(config),
+  constErrors: asValue(constErrors),
 
   mongoClient: asFunction(mongoClient).singleton(),
+
+  ApiError: asValue(ApiError),
   logger: asFunction(logger).singleton(),
 
   routerCarV1: asFunction(routerCarV1).singleton(),
   routerHealth: asFunction(routerHealth).singleton(),
 
   handlerCar: asFunction(handlerCarV1).singleton(),
-  handlerDefault: asFunction(handlerDefault).singleton(),
-
-  ApiError: asValue(ApiError),
-
-  constErrors: asValue(constErrors)
+  handlerDefault: asFunction(handlerDefault).singleton()
 });
 
 const app = container.resolve('express')();
