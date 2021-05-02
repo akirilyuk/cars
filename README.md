@@ -205,7 +205,7 @@ Also, each time an error is returned by the api, a dedicated error code  is used
 where exactly the error was thrown. Furthermore, each request error is logged with the error stack, 4xx errors are logged
 with  ``warn`` level, 5xx errors with ``error`` level. If no status code was provided, we assume its ``INTERNAL_SERVER_ERROR``.
 
-For examples you can checkout the code in ````
+For examples you can checkout the code in ``./src/handlers/v1/car``
 
 ```js
 
