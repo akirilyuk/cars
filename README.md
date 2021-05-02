@@ -4,9 +4,7 @@ Cars API coding challenge implementation
 
 ## Description
 
-This is the implementation of a coding challenge:
-
-Requirements:
+This is the implementation of a coding challenge.
 
 ## Prerequisites
 
