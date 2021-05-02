@@ -250,9 +250,13 @@ module.exports = ({}) => { class Test {}; return new Test()}
 
 module.exports = ({
   config, // configuration of core app
-  ApiError, //current environment, value of the environment enum
+  ApiError, // ApiError object to be used for error handling
   httpStatus, // http status codes, npm http-status-codes package
   logger, // logger instance, creates a new logger via logger('loggerName', { default: 'context'});
+  mongoose, // mongoose package
+  ajv, // ajv validator instance
+  uuid,  // uuid.v4 for unique id generation
+  express // express package                 
 }) => { return yourcodehere; } // return your instance, function, class here };
 
 ```
