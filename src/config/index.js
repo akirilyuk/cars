@@ -14,7 +14,8 @@ module.exports = {
     OPTIONS: {
       connectTimeoutMS: Number(process.env.MONGO_CONNECTION_TIMEOUT) || 30000,
       useNewUrlParser: true,
-      keepAlive: 1
+      keepAlive: 1,
+      useUnifiedTopology: true
     }
   }
 };
