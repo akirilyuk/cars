@@ -1,7 +1,7 @@
-const handlerCar = require('./car');
+const v1 = require('./v1');
 const handlerDefault = require('./default');
 
 module.exports = {
-  handlerCar,
+  ...v1,
   handlerDefault
 };

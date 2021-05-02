@@ -5,20 +5,30 @@ module.exports = ({
   constErrors: {
     handler: {
       car: {
-        findCarById,
-        updateCar,
-        validateCreate,
-        validateUpdate,
-        validateId,
-        updateCarWithFindOneAndUpdate,
-        deleteCar,
-        createCar,
-        getCars
+        v1: {
+          findCarById,
+          updateCar,
+          validateCreate,
+          validateUpdate,
+          validateId,
+          updateCarWithFindOneAndUpdate,
+          deleteCar,
+          createCar,
+          getCars
+        }
       }
     }
   }
 }) => ({
-  getCars: async (req, res, next) => {
+  /**
+   * Get all metadata of all cars. Each dedicated occurrence of each different property value is counted and returned
+   * together with the total number of car objects in the system.
+   * @param req {IncomingMessage} incoming request message
+   * @param res {ServerResponse} express server response
+   * @param next {function} callback function to trigger next route
+   * @return {Promise<*>}
+   */
+  getCarsMeta: async (req, res, next) => {
     let error;
     try {
       const carsMeta = await ModelCar.getAllCarsMeta({});
@@ -230,7 +240,7 @@ module.exports = ({
     } else {
       next(
         new ApiError(
-          { message: errors },
+          new Error(errors),
           validateCreate.validationError,
           BAD_REQUEST
         )
@@ -255,7 +265,7 @@ module.exports = ({
     } else {
       next(
         new ApiError(
-          { message: 'provided ids do not match' },
+          new Error('provided ids do not match'),
           validateId.mismatch,
           BAD_REQUEST
         )
@@ -285,7 +295,7 @@ module.exports = ({
         res.status(OK).send({});
       } else {
         error = new ApiError(
-          { message: 'item not found' },
+          new Error('item not found'),
           deleteCar.notFound,
           NOT_FOUND
         );

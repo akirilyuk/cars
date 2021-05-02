@@ -1,5 +1,7 @@
 version: "3.9"
 
+#https://www.datanovia.com/en/lessons/docker-compose-wait-for-container-using-wait-tool/docker-compose-wait-for-mongodb-container-to-be-ready/
+# documentation on the wait, to ensure the DB is ready before we start the app
 services:
   mongodb:
     image: mongo:latest
@@ -13,6 +15,7 @@ services:
       - ./db:/data/db
   app:
     build: .
+    restart: on-failure
     depends_on:
       - mongodb
     ports:

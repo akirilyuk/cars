@@ -7,8 +7,8 @@ const Ajv = require('ajv');
 const { v4: uuid } = require('uuid');
 const { createContainer, asValue, asFunction } = require('awilix');
 
-const { routerCar, routerHealth } = require('./routes');
-const { handlerCar, handlerDefault } = require('./handlers');
+const { routerCarV1, routerHealth } = require('./routes');
+const { handlerCarV1, handlerDefault } = require('./handlers');
 const { ModelCar } = require('./models');
 const { mongoClient, logger } = require('./lib');
 const { ApiError } = require('./util');
@@ -33,10 +33,10 @@ container.register({
   mongoClient: asFunction(mongoClient).singleton(),
   logger: asFunction(logger).singleton(),
 
-  routerCar: asFunction(routerCar).singleton(),
+  routerCarV1: asFunction(routerCarV1).singleton(),
   routerHealth: asFunction(routerHealth).singleton(),
 
-  handlerCar: asFunction(handlerCar).singleton(),
+  handlerCar: asFunction(handlerCarV1).singleton(),
   handlerDefault: asFunction(handlerDefault).singleton(),
 
   ApiError: asValue(ApiError),
@@ -53,7 +53,7 @@ const { preRequest, successHandler, errorHandler } = container.resolve(
 app
   .use(bodyParser.json())
   .use(preRequest)
-  .use('/api', container.resolve('routerCar'))
+  .use('/api', container.resolve('routerCarV1'))
   .use('/health', container.resolve('routerHealth'))
   .use(successHandler);
 
