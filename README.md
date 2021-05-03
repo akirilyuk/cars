@@ -8,8 +8,8 @@ This is the implementation of a coding challenge.
 
 ## Prerequisites
 
-This project uses ``Node.js 14``, ``yarn`` and ``Docker`` with ``Docker-Compose``.
-To be able to develop and start the project, please make sure that you have these tools installed on you computer.
+This project uses [Node.js 14](https://nodejs.org/en/download/current/), [yarn](https://yarnpkg.com/) and [Docker](https://www.docker.com/products/docker-desktop) with [Docker-Compose](https://docs.docker.com/compose/install/).
+To be able to develop and/or to start the project, please make sure that you have these tools installed on you computer.
 
 ## First start and running in dev mode
 
